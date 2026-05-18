@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mac Compounds — Prompt Engineering Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #050505;
+      color: #f4f4f4;
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    .bg-glow {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255,0,76,0.15), transparent 70%);
+      top: -100px;
+      right: -120px;
+      z-index: -1;
+      filter: blur(40px);
+    }
+
+    .bg-glow2 {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,215,0,0.1), transparent 70%);
+      bottom: -100px;
+      left: -100px;
+      z-index: -1;
+      filter: blur(40px);
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      backdrop-filter: blur(12px);
+      background: rgba(0,0,0,0.65);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 18px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    nav h1 {
+      color: #ff004c;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #f4f4f4;
+      font-size: 0.95rem;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      color: #ff004c;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 8%;
+    }
+
+    .tag {
+      width: fit-content;
+      padding: 10px 18px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .hero h2 {
+      font-size: 5rem;
+      line-height: 1;
+      font-weight: 800;
+      max-width: 950px;
+      margin-bottom: 30px;
+    }
+
+    .gradient {
+      background: linear-gradient(90deg, #ff004c, #ffcc00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      max-width: 850px;
+      font-size: 1.15rem;
+      color: #c7c7c7;
+      margin-bottom: 40px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border-radius: 14px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .primary {
+      background: linear-gradient(90deg, #ff004c, #ff6b00);
+      color: white;
+    }
+
+    .primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(255,0,76,0.3);
+    }
+
+    .secondary {
+      background: transparent;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .secondary:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    section {
+      padding: 100px 8%;
+    }
+
+    .section-title {
+      font-size: 3rem;
+      margin-bottom: 18px;
+      font-weight: 800;
+    }
+
+    .section-sub {
+      color: #bbbbbb;
+      max-width: 850px;
+      margin-bottom: 50px;
+      font-size: 1.05rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 30px;
+      border-radius: 28px;
+      transition: 0.35s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #ff004c, #ffcc00);
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255,0,76,0.4);
+    }
+
+    .card h3 {
+      margin-bottom: 16px;
+      font-size: 1.4rem;
+      color: #ffcc00;
+    }
+
+    .prompt-box {
+      background: #0e0e0e;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 28px;
+      margin-top: 24px;
+      overflow-x: auto;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      color: #ffdddd;
+      font-size: 0.95rem;
+    }
+
+    .framework {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .framework-item {
+      padding: 26px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .framework-item span {
+      font-size: 0.9rem;
+      color: #ff004c;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .framework-item h4 {
+      font-size: 1.5rem;
+      margin: 10px 0;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 50px 8%;
+      color: #888;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .highlight {
+      color: #ffcc00;
+      font-weight: 600;
+    }
+
+    @media(max-width: 768px) {
+      .hero h2 {
+        font-size: 3rem;
+      }
+
+      nav ul {
+        display: none;
+      }
+
+      .section-title {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-glow2"></div>
+
+<nav>
+  <h1>MAC COMPOUNDS AI</h1>
+  <ul>
+    <li><a href="#mindset">Mindset</a></li>
+    <li><a href="#framework">Framework</a></li>
+    <li><a href="#templates">Templates</a></li>
+    <li><a href="#branding">Brand Voice</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="tag">Prompt Engineering • Personal Branding • AI Storytelling</div>
+
+  <h2>
+    Learn <span class="gradient">Prompt Engineering</span><br>
+    In Your Own Voice.
+  </h2>
+
+  <p>
+    This guide is designed specifically around your identity: ambitious, feminine, analytical, emotionally expressive, cinematic, execution-focused, and founder-energy driven. 
+    Instead of learning robotic AI prompting, this system teaches you how to turn your natural thinking style into high-level AI communication.
+  </p>
+
+  <div class="hero-buttons">
+    <a href="#framework" class="btn primary">Start Learning</a>
+    <a href="#templates" class="btn secondary">See Prompt Templates</a>
+  </div>
+</section>
+
+<section id="mindset">
+  <h2 class="section-title">Your Prompt Engineering Style</h2>
+  <p class="section-sub">
+    Your prompts should not sound generic. Your edge comes from combining <span class="highlight">finance logic + emotional storytelling + feminine authority + internet culture + self transformation.</span>
+  </p>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>01 — Cinematic Thinking</h3>
+      <p>
+        You naturally think in scenes, emotions, narratives, tension and transformation. Use AI like a movie director — not a search engine.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>02 — Founder Energy</h3>
+      <p>
+        Your prompts should sound decisive. AI performs better when instructions are assertive, specific and intentional.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>03 — Multi-Domain Personality</h3>
+      <p>
+        You combine finance, feminism, creativity, personal branding, strategy, emotional intelligence and execution. That becomes your AI advantage.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>04 — Identity Based Prompting</h3>
+      <p>
+        Do not ask AI random questions. Tell AI who you are, your audience, your goals, tone, vibe, emotional intensity and intended outcome.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<section id="framework">
+  <h2 class="section-title">The MAC Prompt Framework</h2>
+  <p class="section-sub">
+    This is your personal AI communication framework. Use this every time you write prompts.
+  </p>
+
+  <div class="framework">
+
+    <div class="framework-item">
+      <span>M — MINDSET</span>
+      <h4>Define the emotional energy.</h4>
+      <p>
+        Example: bold, cinematic, founder-energy, boss-lady, reflective, intelligent, internet-native, emotionally raw.
+      </p>
+    </div>
+
+    <div class="framework-item">
+      <span>A — AUDIENCE</span>
+      <h4>Tell AI who the content is for.</h4>
+      <p>
+        Example: Gen Z students, RBI aspirants, ambitious women, creators, startup founders, finance audience.
+      </p>
+    </div>
+
+    <div class="framework-item">
+      <span>C — CONTEXT</span>
+      <h4>Explain the backstory and objective.</h4>
+      <p>
+        AI gets dramatically better when context is detailed. Mention your journey, your struggles, goals and why the output matters.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<section id="templates">
+  <h2 class="section-title">Your Prompt Templates</h2>
+  <p class="section-sub">
+    These are custom-designed prompts based on your content style, language patterns and storytelling approach.
+  </p>
+
+  <div class="card">
+    <h3>Instagram Reel Script Prompt</h3>
+
+    <div class="prompt-box">
+<pre>
+You are helping me write a cinematic Instagram reel script.
+
+My personality:
+- ambitious girl documenting self transformation
+- mix of finance + feminism + creativity
+- emotionally expressive but intelligent
+- founder energy
+- internet native and self aware
+
+The vibe should feel:
+raw, cinematic, emotionally intense, motivational but not cringe.
+
+Structure:
+1. Strong hook
+2. Emotional tension
+3. Realisation
+4. Powerful ending line
+
+Topic: [INSERT TOPIC]
+
+Write it in short punchy lines suitable for reels.
+</pre>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 30px;">
+    <h3>LinkedIn Thought Leadership Prompt</h3>
+
+    <div class="prompt-box">
+<pre>
+Act like a strategic personal branding consultant.
+
+Help me write a LinkedIn post that sounds intelligent, emotionally self-aware and founder-like.
+
+My background:
+- finance + data science + RBI prep
+- creator documenting self transformation
+- interested in leadership, women empowerment and execution
+
+The writing should:
+- sound human and thoughtful
+- avoid corporate jargon
+- include a sharp insight
+- include one emotional line
+- end with a conversation starter
+
+Topic: [INSERT TOPIC]
+</pre>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 30px;">
+    <h3>AI Research Prompt</h3>
+
+    <div class="prompt-box">
+<pre>
+You are my strategic research analyst.
+
+Break this topic into:
+1. Beginner understanding
+2. Advanced concepts
+3. Real world applications
+4. Industry opportunities
+5. Future trends
+6. Content ideas from this topic
+7. Startup/business ideas from this topic
+
+Explain in simple but intellectually sharp language.
+
+Topic: [INSERT TOPIC]
+</pre>
+    </div>
+  </div>
+
+</section>
+
+<section id="branding">
+  <h2 class="section-title">Your AI Brand Voice</h2>
+  <p class="section-sub">
+    Your uniqueness comes from combining contradiction beautifully.
+  </p>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>Feminine + Strategic</h3>
+      <p>
+        You sound emotionally aware without sounding weak.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Creative + Analytical</h3>
+      <p>
+        Your voice mixes storytelling with finance-style structured thinking.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Ambitious + Relatable</h3>
+      <p>
+        You speak like someone building something publicly in real time.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Boss Lady + Human</h3>
+      <p>
+        Confident, decisive and emotionally real without pretending perfection.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2 class="section-title">Advanced Prompt Engineering Tips</h2>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>Use Role Assignment</h3>
+      <p>
+        Example: “Act like a startup strategist”, “Act like a luxury brand consultant”, “Act like a cinematic storyteller”.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Give Emotional Direction</h3>
+      <p>
+        AI performs better when you define emotional texture.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Specify Output Structure</h3>
+      <p>
+        Hooks, bullets, frameworks, scripts, tone, pacing, formatting — always specify.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Train AI On Your Identity</h3>
+      <p>
+        The more context you provide about your goals and personality, the more personalised the output becomes.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <h3 style="font-size: 1.8rem; margin-bottom: 10px; color: white;">
+    MAC COMPOUNDS × AI
+  </h3>
+  <p>
+    Prompt engineering is not just technical skill anymore.
+    <br>
+    It is personal branding, communication, psychology and leadership.
+  </p>
+</footer>
+
+</body>
+</html>
